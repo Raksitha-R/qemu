@@ -1,0 +1,104 @@
+nfs
+Ubuntu:
+sudo apt install nfs-kernal-server
+sudo mkdir -p /srv/nfs/devi
+sudo chown nobody:nogroup /srv/nfs/devi
+sudo chmod 777 /srv/nfs/devi
+sudo nano /etc/exports  -> /srv/nfs/devi ipaddvictim (rw,subtree-check)
+sudo exportfs -a
+sudo systemctl restart nfs-kernel-server
+
+cd /srv/nfs/devi 
+ls
+
+
+kali:
+sudo apt install nfs-common
+sudo mkdir -p /mnt/devi
+sudo mount ubuntuipaddr:/srv/nfs/devi /mnt/devi
+ls /mnt/devi
+cd /mnt/devi 
+nano d.txt
+
+SSH
+Ubuntu
+sudo apt update
+sudo apt install openssh-server
+sudo systemctl start ssh
+sudo systemmctl status ssh
+echo "hi">1.txt
+cat 1.txt
+scp 1.txt tce@ipvict:/home/tce
+
+Kali
+ls
+cat 1.txt
+
+
+shared folders
+
+devices->guest
+sudo su
+ls /media
+cd /media/sf_vt
+nano file.txt
+
+
+Openstack(microstack)
+
+sudo snap install microstack
+sudo microstack init --auto --control
+http://localhost
+sudo microstack.openstack endpoint list
+sudo cat /var/snap/microstack/common/etc/microstack.rc
+sudo microstack.openstack image create /
+image list
+
+KVM
+sudo apt install virt-manager
+
+sudo qemu-img convert -0 vdi kali-linux-2025.3-qemu-amd64.qcow2 kali.vdi -p
+sudo qemu-img convert -0 vpc kali-linux-2025.3-qemu-amd64.qcow2 kali.vhd -p
+sudo qemu-img convert -0 raw kali-linux-2025.3-qemu-amd64.qcow2 kali.img -p
+
+sudo qemu-img resize kali-linux-2025.3-qemu-amd64.qcow2 +1G
+
+
+
+Storage virtualization
+
+sudo su
+fdisk -l
+ apt install lvm2
+pvcreate /dev/sda
+vgcreate cloud-vg /dev/sda
+lvcreate -L 1G -n data cloud-vg
+
+mkfs.ext4 /dev/cloud-vg/data
+mkdir /mnt/devi
+mount /dev/cloud-vg/data /mnt/devi
+
+lvresize --size +1G cloud-vg/data
+
+
+
+
+linux Brigde
+
+sudo apt install bridge-utils
+brctl addbr br-cloud
+brctl addif eth0
+ifconfig eth0 0
+ifconfig br-cloud 10.0.0.15 netmask 255.255.255.0
+route add default gw 10.0.0.15 dev br-cloud
+route -n
+brctl show
+
+OpenvSwitch 
+sudo apt install openvswitch-switch
+sudo systemctl enable openvswitch-switch
+sudo systemctl start openvswitch-switch
+sudo systemctl status openvswitch-switch
+sudo ovs-vsctl add-br ovs-br0
+sudo ovs-vsctl add-port ovs-br0 eth1
+sudo ovs-vsctl show
