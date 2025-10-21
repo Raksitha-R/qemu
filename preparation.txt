@@ -58,9 +58,6 @@ KVM
 sudo apt install virt-manager
 
 sudo qemu-img convert -0 vdi kali-linux-2025.3-qemu-amd64.qcow2 kali.vdi -p
-sudo qemu-img convert -0 vpc kali-linux-2025.3-qemu-amd64.qcow2 kali.vhd -p
-sudo qemu-img convert -0 raw kali-linux-2025.3-qemu-amd64.qcow2 kali.img -p
-
 sudo qemu-img resize kali-linux-2025.3-qemu-amd64.qcow2 +1G
 
 
@@ -69,16 +66,17 @@ Storage virtualization
 
 sudo su
 fdisk -l
- apt install lvm2
-pvcreate /dev/sda
-vgcreate cloud-vg /dev/sda
-lvcreate -L 1G -n data cloud-vg
-
-mkfs.ext4 /dev/cloud-vg/data
+pvdisplay,vgdisplay,lvdisplay
+pvcreate /dev/sdb
+vgcreate ubuntu-vg /dev/sdb
+lvcreate -L 10G -n ubuntu-lv ubuntu-vg
+mkfs.ext4 /dev/ubuntu-vg/ubuntu-lv
 mkdir /mnt/devi
-mount /dev/cloud-vg/data /mnt/devi
+mount /dev/ubuntu-vg/ubuntu-lv/mnt/devi
+lvresize --size +1G ubuntu-vg/ubuntu-lv
+df -h
+resize2fs /dev/mapper/ubuntu--vg-ubuntu--ls
 
-lvresize --size +1G cloud-vg/data
 
 
 
